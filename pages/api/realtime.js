@@ -1,10 +1,14 @@
 import { pool } from "../../lib/db";
 
 export default async function handler(req, res) {
-  const result = await pool.query(`
-    SELECT COUNT(*) FROM events
-    WHERE created_at >= NOW() - INTERVAL '1 minute'
-  `);
+  try {
+    const result = await pool.query(`
+      SELECT COUNT(*) FROM events
+      WHERE created_at >= NOW() - INTERVAL '1 minute'
+    `);
 
-  res.json({ active: result.rows[0].count });
+    res.json({ active: Number(result.rows[0].count) });
+  } catch (err) {
+    res.status(500).json({ error: "DB error" });
+  }
 }

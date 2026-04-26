@@ -4,10 +4,17 @@ const USER = "Kano";
 const PASS = "Kano@123";
 
 export default function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).end();
+  }
+
   const { username, password } = req.body;
 
   if (username === USER && password === PASS) {
-    const token = jwt.sign({ user: username }, "secret123", { expiresIn: "7d" });
+    const token = jwt.sign({ user: username }, "secret123", {
+      expiresIn: "7d",
+    });
+
     return res.json({ token });
   }
 

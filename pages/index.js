@@ -1,29 +1,67 @@
 import { useEffect, useState } from "react";
-const [activeUsers, setActiveUsers] = useState(0);
+import { useRouter } from "next/router";
+
 import {
   LineChart,
   Line,
   XAxis,
   YAxis,
-  Tooltip
+  Tooltip,
 } from "recharts";
 
 export default function Home() {
   const router = useRouter();
 
+  const [activeUsers, setActiveUsers] = useState(0);
+
+  // 🔐 Auth check
+  useEffect(() => {
+    const token =
+      localStorage.getItem("token") ||
+      sessionStorage.getItem("token");
+
+    if (!token) {
+      router.push("/login");
+    }
+  }, []);
+
+  // 🔴 Realtime users
   useEffect(() => {
     const interval = setInterval(async () => {
-      const res = await fetch("/api/realtime");
-      const data = await res.json();
-      setActiveUsers(data.active);
+      try {
+        const res = await fetch("/api/realtime");
+        const data = await res.json();
+        setActiveUsers(data.active);
+      } catch (err) {
+        console.log("Realtime error");
+      }
     }, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
-<LineChart width={400} height={200} data={[{name:"Today", value: activeUsers}]}>
-  <XAxis dataKey="name" />
-  <YAxis />
-  <Tooltip />
-  <Line type="monotone" dataKey="value" />
-</LineChart>
+  const chartData = [
+    { name: "Live Users", users: activeUsers },
+  ];
+
+  return (
+    <div style={{ padding: 40 }}>
+      <h1>🚀 Xyra Analytics Dashboard</h1>
+
+      <h2>🔴 Live Users: {activeUsers}</h2>
+
+      <div style={{ marginTop: 40 }}>
+        <LineChart width={600} height={300} data={chartData}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Line
+            type="monotone"
+            dataKey="users"
+            stroke="#8884d8"
+          />
+        </LineChart>
+      </div>
+    </div>
+  );
+}

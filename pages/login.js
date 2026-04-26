@@ -10,7 +10,9 @@ export default function Login() {
   const handleLogin = async () => {
     const res = await fetch("/api/login", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(form),
     });
 
@@ -22,9 +24,10 @@ export default function Login() {
       } else {
         sessionStorage.setItem("token", data.token);
       }
+
       window.location.href = "/";
     } else {
-      alert("Invalid login");
+      alert("Login failed");
     }
   };
 
@@ -32,19 +35,32 @@ export default function Login() {
     <div style={{ padding: 50 }}>
       <h1>Login</h1>
 
-      <input placeholder="Username"
-        onChange={(e) => setForm({ ...form, username: e.target.value })} />
+      <input
+        placeholder="Username"
+        onChange={(e) =>
+          setForm({ ...form, username: e.target.value })
+        }
+      />
 
       <br /><br />
 
-      <input type="password" placeholder="Password"
-        onChange={(e) => setForm({ ...form, password: e.target.value })} />
+      <input
+        type="password"
+        placeholder="Password"
+        onChange={(e) =>
+          setForm({ ...form, password: e.target.value })
+        }
+      />
 
       <br /><br />
 
       <label>
-        <input type="checkbox"
-          onChange={(e) => setForm({ ...form, remember: e.target.checked })} />
+        <input
+          type="checkbox"
+          onChange={(e) =>
+            setForm({ ...form, remember: e.target.checked })
+          }
+        />
         Remember me
       </label>
 
