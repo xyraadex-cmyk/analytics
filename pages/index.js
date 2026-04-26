@@ -31,7 +31,16 @@ export default function Home() {
       try {
         const res = await fetch("/api/realtime");
         const data = await res.json();
+
         setActiveUsers(data.active);
+
+        setChartData((prev) => [
+          ...prev.slice(-10), // keep last 10 points
+          {
+            time: new Date().toLocaleTimeString(),
+            users: data.active,
+          },
+        ]);
       } catch (err) {
         console.log("Realtime error");
       }
@@ -40,9 +49,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const chartData = [
-    { name: "Live Users", users: activeUsers },
-  ];
+  const [chartData, setChartData] = useState([]);
 
   return (
     <div style={{ padding: 40 }}>
@@ -52,7 +59,7 @@ export default function Home() {
 
       <div style={{ marginTop: 40 }}>
         <LineChart width={600} height={300} data={chartData}>
-          <XAxis dataKey="name" />
+          <XAxis dataKey="time" />
           <YAxis />
           <Tooltip />
           <Line
