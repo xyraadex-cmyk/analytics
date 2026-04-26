@@ -7,12 +7,12 @@ export default async function handler(req, res) {
       "SELECT COUNT(*) FROM events WHERE created_at >= NOW() - INTERVAL '1 day'"
     );
 
-    const sources = await pool.query(`
+    const best = await pool.query(`
       SELECT referrer, COUNT(*) as count
       FROM events
       GROUP BY referrer
       ORDER BY count DESC
-      LIMIT 5
+      LIMIT 1
     `);
 
     res.json({

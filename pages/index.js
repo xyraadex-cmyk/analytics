@@ -1,31 +1,29 @@
 import { useEffect, useState } from "react";
+const [activeUsers, setActiveUsers] = useState(0);
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip
+} from "recharts";
 
 export default function Home() {
-  const [data, setData] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
-    fetch("/api/stats")
-      .then((res) => res.json())
-      .then(setData);
+    const interval = setInterval(async () => {
+      const res = await fetch("/api/realtime");
+      const data = await res.json();
+      setActiveUsers(data.active);
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
-  if (!data) return <p>Loading...</p>;
-
-  return (
-    <div style={{ padding: 20 }}>
-      <h1>📊 Xyra Analytics</h1>
-
-      <h2>Total Visits: {data.total}</h2>
-      <h3>Today: {data.today}</h3>
-
-      <h3>Top Sources:</h3>
-      <ul>
-        {data.sources.map((s, i) => (
-          <li key={i}>
-            {s.referrer} — {s.count}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+<LineChart width={400} height={200} data={[{name:"Today", value: activeUsers}]}>
+  <XAxis dataKey="name" />
+  <YAxis />
+  <Tooltip />
+  <Line type="monotone" dataKey="value" />
+</LineChart>
