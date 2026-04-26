@@ -16,13 +16,10 @@ export default function Home() {
 
   // 🔐 Auth check
   useEffect(() => {
-    const token =
-      localStorage.getItem("token") ||
-      sessionStorage.getItem("token");
-
-    if (!token) {
-      router.push("/login");
-    }
+    fetch("/api/stats")
+      .then(res => res.json())
+      .then(setStats)
+      .catch(() => {});
   }, []);
 
   // 🔴 Realtime users
@@ -68,6 +65,23 @@ export default function Home() {
             stroke="#8884d8"
           />
         </LineChart>
+        <h3>Traffic Sources</h3>
+        <ul>
+          {stats?.ref?.map((r, i) => (
+            <li key={i}>
+              {r.ref_type}: {r.count}
+            </li>
+          ))}
+        </ul>
+
+        <h3>Devices</h3>
+        <ul>
+          {stats?.device?.map((d, i) => (
+            <li key={i}>
+              {d.device}: {d.count}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

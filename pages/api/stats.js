@@ -2,23 +2,21 @@ import { pool } from "../../lib/db";
 
 export default async function handler(req, res) {
   try {
-    const total = await pool.query("SELECT COUNT(*) FROM events");
-    const today = await pool.query(
-      "SELECT COUNT(*) FROM events WHERE created_at >= NOW() - INTERVAL '1 day'"
-    );
-
-    const best = await pool.query(`
-      SELECT referrer, COUNT(*) as count
+    const ref = await pool.query(`
+      SELECT ref_type, COUNT(*) as count
       FROM events
-      GROUP BY referrer
-      ORDER BY count DESC
-      LIMIT 1
+      GROUP BY ref_type
+    `);
+
+    const device = await pool.query(`
+      SELECT device, COUNT(*) as count
+      FROM events
+      GROUP BY device
     `);
 
     res.json({
-      total: total.rows[0].count,
-      today: today.rows[0].count,
-      sources: sources.rows,
+      ref: ref.rows,
+      device: device.rows,
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
